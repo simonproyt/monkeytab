@@ -44,5 +44,9 @@
 		"vitest": "^4.1.8",
 		"vitest-browser-svelte": "^2.1.1",
 		"wrangler": "^4.97.0"
+	},
+	"dependencies": {
+		"@fontsource-variable/outfit": "^5.3.0",
+		"@fontsource/outfit": "^5.3.0"
 	}
 }
