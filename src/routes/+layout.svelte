@@ -103,12 +103,12 @@
 
 	<!-- Picsum Background -->
 	{#if settingsState.backgroundType === 'picsum'}
-		<!-- Low-res blurred placeholder (Proxied for CORS extraction) -->
+		<!-- Low-res blurred placeholder (Direct fetch for speed) -->
 		<img
-			src="/api/proxy?url={encodeURIComponent('https://picsum.photos/192/108?blur=2')}"
+			src="https://picsum.photos/192/108?blur=2"
 			alt=""
 			crossorigin="anonymous"
-			class="absolute inset-0 h-full w-full scale-105 object-cover opacity-60 blur-md"
+			class="absolute inset-0 h-full w-full object-cover opacity-60 blur-md scale-105"
 			onload={handleThumbLoad}
 		/>
 		<!-- High-res full image (Loaded directly, no proxy overhead) -->
@@ -124,12 +124,12 @@
 
 	<!-- NASA APOD Background -->
 	{#if settingsState.backgroundType === 'apod' && apodUrl}
-		<!-- Low-res blurred placeholder (Proxied for CORS extraction) -->
+		<!-- Low-res blurred placeholder (Direct fetch via wsrv.nl for speed) -->
 		<img
-			src={`/api/proxy?url=${encodeURIComponent(`https://wsrv.nl/?url=${encodeURIComponent(apodUrl)}&w=100&blur=5`)}`}
+			src={`https://wsrv.nl/?url=${encodeURIComponent(apodUrl)}&w=100&blur=5`}
 			alt=""
 			crossorigin="anonymous"
-			class="absolute inset-0 h-full w-full scale-105 object-cover opacity-60 blur-md"
+			class="absolute inset-0 h-full w-full object-cover opacity-60 blur-md scale-105"
 			onload={handleThumbLoad}
 		/>
 		<!-- High-res full image (Loaded directly, no proxy overhead) -->
