@@ -33,7 +33,7 @@
 
 		<!-- Side Panel -->
 		<div
-			class="glass-panel relative h-full w-full max-w-sm overflow-y-auto rounded-none rounded-l-2xl border-y-0 border-r-0 p-6 shadow-2xl"
+			class="glass-panel custom-scrollbar relative h-full max-h-screen w-full max-w-sm overflow-y-auto rounded-none rounded-l-2xl border-y-0 border-r-0 p-6 pb-20 shadow-2xl"
 			transition:fly={{ x: 300, duration: 300, opacity: 1 }}
 			role="dialog"
 			aria-modal="true"
@@ -61,6 +61,125 @@
 			<h2 class="mb-6 text-xl font-semibold text-white">Settings</h2>
 
 			<div class="space-y-6">
+				<!-- Search Engine -->
+				<div class="space-y-4 border-b border-white/10 pb-4">
+					<div>
+						<h3 class="text-sm font-medium text-slate-200">Search Engine</h3>
+						<p class="mt-1 text-xs text-slate-400">Choose your default search provider.</p>
+					</div>
+
+					<div class="grid grid-cols-2 gap-2">
+						<button
+							class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.searchEngine ===
+							'google'
+								? '!border-[var(--theme-accent)] text-white'
+								: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+							style={settingsState.searchEngine === 'google'
+								? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+								: ''}
+							onclick={() => {
+								settingsState.searchEngine = 'google';
+								saveSettings();
+							}}
+						>
+							Google
+						</button>
+						<button
+							class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.searchEngine ===
+							'duckduckgo'
+								? '!border-[var(--theme-accent)] text-white'
+								: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+							style={settingsState.searchEngine === 'duckduckgo'
+								? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+								: ''}
+							onclick={() => {
+								settingsState.searchEngine = 'duckduckgo';
+								saveSettings();
+							}}
+						>
+							DuckDuckGo
+						</button>
+						<button
+							class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.searchEngine ===
+							'bing'
+								? '!border-[var(--theme-accent)] text-white'
+								: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+							style={settingsState.searchEngine === 'bing'
+								? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+								: ''}
+							onclick={() => {
+								settingsState.searchEngine = 'bing';
+								saveSettings();
+							}}
+						>
+							Bing
+						</button>
+						<button
+							class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.searchEngine ===
+							'brave'
+								? '!border-[var(--theme-accent)] text-white'
+								: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+							style={settingsState.searchEngine === 'brave'
+								? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+								: ''}
+							onclick={() => {
+								settingsState.searchEngine = 'brave';
+								saveSettings();
+							}}
+						>
+							Brave
+						</button>
+					</div>
+
+					<button
+						class="w-full rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.searchEngine ===
+						'custom'
+							? '!border-[var(--theme-accent)] text-white'
+							: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+						style={settingsState.searchEngine === 'custom'
+							? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+							: ''}
+						onclick={() => {
+							settingsState.searchEngine = 'custom';
+							saveSettings();
+						}}
+					>
+						{settingsState.customSearchName || 'Custom Provider'}
+					</button>
+
+					{#if settingsState.searchEngine === 'custom'}
+						<div class="animate-in fade-in slide-in-from-top-2 space-y-3 pt-1">
+							<div class="space-y-1">
+								<label for="customSearchName" class="block text-xs text-slate-400"
+									>Provider Name (e.g. Kagi, Ecosia)</label
+								>
+								<input
+									id="customSearchName"
+									type="text"
+									placeholder="Kagi"
+									bind:value={settingsState.customSearchName}
+									onchange={saveSettings}
+									class="w-full rounded-lg border border-white/20 bg-black/40 px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-[var(--theme-accent)] focus:outline-none"
+								/>
+							</div>
+
+							<div class="space-y-1">
+								<label for="customSearchUrl" class="block text-xs text-slate-400"
+									>Search URL (use %s for query)</label
+								>
+								<input
+									id="customSearchUrl"
+									type="text"
+									placeholder="https://kagi.com/search?q=%s"
+									bind:value={settingsState.customSearchUrl}
+									onchange={saveSettings}
+									class="w-full rounded-lg border border-white/20 bg-black/40 px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-[var(--theme-accent)] focus:outline-none"
+								/>
+							</div>
+						</div>
+					{/if}
+				</div>
+
 				<!-- Widgets -->
 				<div class="space-y-4 border-b border-white/10 pb-4">
 					<div>
@@ -242,7 +361,7 @@
 								<input
 									type="color"
 									bind:value={settingsState.customThemeAccent}
-									onchange={saveSettings}
+									oninput={saveSettings}
 									class="h-8 w-14 cursor-pointer rounded border border-white/20 bg-transparent p-0.5"
 								/>
 								<span class="font-mono text-sm text-slate-300"
@@ -273,7 +392,7 @@
 							min="0"
 							max="100"
 							bind:value={settingsState.glassOpacity}
-							onchange={saveSettings}
+							oninput={saveSettings}
 							class="w-full accent-[var(--theme-accent)]"
 						/>
 					</div>
@@ -289,7 +408,7 @@
 							min="0"
 							max="100"
 							bind:value={settingsState.glassBlur}
-							onchange={saveSettings}
+							oninput={saveSettings}
 							class="w-full accent-[var(--theme-accent)]"
 						/>
 					</div>
@@ -334,7 +453,7 @@
 								<input
 									type="color"
 									bind:value={settingsState.customGlassTint}
-									onchange={saveSettings}
+									oninput={saveSettings}
 									class="h-8 w-14 cursor-pointer rounded border border-white/20 bg-transparent p-0.5"
 								/>
 								<span class="font-mono text-sm text-slate-300">{settingsState.customGlassTint}</span

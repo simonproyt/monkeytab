@@ -11,12 +11,17 @@
 	.glass-panel {
 		@apply relative overflow-hidden;
 		background-color: color-mix(in srgb, var(--glass-tint) var(--glass-opacity), transparent);
-		backdrop-filter: blur(var(--glass-blur));
-		border: 1px solid color-mix(in srgb, var(--glass-tint) 10%, transparent);
+		backdrop-filter: blur(var(--glass-blur)) saturate(1.2) contrast(1.05);
+		border: 1px solid
+			color-mix(in srgb, var(--glass-tint) calc(var(--glass-opacity) * 1.5 + 20%), transparent);
 		box-shadow:
-			0 8px 32px 0 rgba(0, 0, 0, 0.3),
-			inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
-			inset 0 -1px 1px 0 rgba(0, 0, 0, 0.2);
+			0 12px 40px 0 rgba(0, 0, 0, 0.35),
+			inset 0 1.5px 1.5px 0 color-mix(in srgb, white var(--glass-opacity), transparent),
+			inset 0 -1.5px 1.5px 0 color-mix(in srgb, black var(--glass-opacity), transparent),
+			inset 1px 0 3px 0
+				color-mix(in srgb, var(--glass-tint) calc(var(--glass-opacity) + 20%), transparent),
+			inset -1px 0 3px 0
+				color-mix(in srgb, var(--theme-accent) calc(var(--glass-opacity) + 20%), transparent);
 		transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 		transform-origin: center;
 		will-change: transform, box-shadow;
@@ -26,10 +31,14 @@
 	.glass-panel.springy-interactive:focus-within {
 		transform: scale(1.02) translateY(-2px);
 		box-shadow:
-			0 16px 40px 0 rgba(0, 0, 0, 0.4),
-			inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
-			inset 0 -1px 1px 0 rgba(0, 0, 0, 0.1);
-		border-color: color-mix(in srgb, var(--theme-accent) 40%, transparent);
+			0 20px 48px 0 rgba(0, 0, 0, 0.45),
+			inset 0 1.5px 1.5px 0 color-mix(in srgb, white calc(var(--glass-opacity) + 20%), transparent),
+			inset 0 -1.5px 1.5px 0 color-mix(in srgb, black calc(var(--glass-opacity) + 10%), transparent),
+			inset 1.5px 0 4px 0
+				color-mix(in srgb, var(--glass-tint) calc(var(--glass-opacity) + 30%), transparent),
+			inset -1.5px 0 4px 0
+				color-mix(in srgb, var(--theme-accent) calc(var(--glass-opacity) + 30%), transparent);
+		border-color: color-mix(in srgb, var(--glass-tint) 60%, transparent);
 	}
 
 	/* Liquid Light Shimmer Reflection */
@@ -43,7 +52,7 @@
 		background: linear-gradient(
 			to right,
 			transparent,
-			color-mix(in srgb, var(--theme-accent) 15%, rgba(255, 255, 255, 0.15)),
+			color-mix(in srgb, var(--glass-tint) 25%, rgba(255, 255, 255, 0.25)),
 			transparent
 		);
 		transform: skewX(-20deg);
@@ -78,16 +87,42 @@
 		transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg))
 			scale(1.02);
 		box-shadow:
-			var(--shadow-x, 0px) var(--shadow-y, 24px) 50px 0 rgba(0, 0, 0, 0.5),
-			inset 1px 0px 3px 0 rgba(0, 255, 255, 0.2),
-			inset -1px 0px 3px 0 rgba(255, 0, 255, 0.2),
-			inset 0 1px 1px 0 rgba(255, 255, 255, 0.3),
-			inset 0 -1px 1px 0 rgba(0, 0, 0, 0.2);
-		border-color: color-mix(in srgb, var(--theme-accent) 40%, transparent);
-		backdrop-filter: blur(var(--glass-blur)) contrast(1.1) brightness(1.15) saturate(1.2);
+			var(--shadow-x, 0px) var(--shadow-y, 24px) 50px 0 rgba(0, 0, 0, 0.55),
+			inset 1.5px 0px 4px 0
+				color-mix(in srgb, var(--glass-tint) calc(var(--glass-opacity) + 35%), transparent),
+			inset -1.5px 0px 4px 0
+				color-mix(in srgb, var(--theme-accent) calc(var(--glass-opacity) + 30%), transparent),
+			inset 0 1.5px 2px 0 color-mix(in srgb, white calc(var(--glass-opacity) + 30%), transparent);
+		border-color: color-mix(in srgb, var(--glass-tint) 60%, transparent);
+		backdrop-filter: blur(var(--glass-blur)) contrast(1.12) brightness(1.05) saturate(1.25);
 	}
 }
 
 body {
 	@apply bg-[#050505] text-white;
+}
+
+/* Custom Glass Scrollbar */
+.custom-scrollbar {
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+	scrollbar-width: auto !important;
+	scrollbar-color: color-mix(in srgb, var(--theme-accent) 60%, white) rgba(0, 0, 0, 0.3) !important;
+}
+.custom-scrollbar::-webkit-scrollbar {
+	width: 10px !important;
+	height: 10px !important;
+	display: block !important;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.3) !important;
+	border-radius: 9999px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--theme-accent) 70%, white) !important;
+	border-radius: 9999px !important;
+	border: 2px solid rgba(0, 0, 0, 0.2) !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: #ffffff !important;
 }

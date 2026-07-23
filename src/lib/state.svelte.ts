@@ -11,7 +11,10 @@ export const settingsState = $state({
 	glassTintMode: 'theme', // 'theme' | 'custom'
 	customGlassTint: '#ffffff',
 	showClock: true,
-	clockFormat: '12h' // '12h' | '24h'
+	clockFormat: '12h', // '12h' | '24h'
+	searchEngine: 'google', // 'google' | 'duckduckgo' | 'bing' | 'brave' | 'custom'
+	customSearchUrl: '',
+	customSearchName: ''
 });
 
 export function initSettings() {
@@ -31,6 +34,11 @@ export function initSettings() {
 			if (parsed.customGlassTint) settingsState.customGlassTint = parsed.customGlassTint;
 			if (parsed.showClock !== undefined) settingsState.showClock = parsed.showClock;
 			if (parsed.clockFormat) settingsState.clockFormat = parsed.clockFormat;
+			if (parsed.searchEngine) settingsState.searchEngine = parsed.searchEngine;
+			if (parsed.customSearchUrl !== undefined)
+				settingsState.customSearchUrl = parsed.customSearchUrl;
+			if (parsed.customSearchName !== undefined)
+				settingsState.customSearchName = parsed.customSearchName;
 		} catch (e) {
 			console.error('Failed to parse settings', e);
 		}
@@ -52,7 +60,10 @@ export function saveSettings() {
 			glassTintMode: settingsState.glassTintMode,
 			customGlassTint: settingsState.customGlassTint,
 			showClock: settingsState.showClock,
-			clockFormat: settingsState.clockFormat
+			clockFormat: settingsState.clockFormat,
+			searchEngine: settingsState.searchEngine,
+			customSearchUrl: settingsState.customSearchUrl,
+			customSearchName: settingsState.customSearchName
 		})
 	);
 }

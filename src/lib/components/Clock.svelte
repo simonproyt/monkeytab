@@ -151,7 +151,7 @@
 			{#if item.char}
 				<div
 					bind:this={digitElements[i]}
-					class="glass-panel ultra-premium-glass relative flex items-center justify-center rounded-2xl border border-white/20 transition-shadow duration-300 {item.isColon
+					class="glass-panel ultra-premium-glass relative flex items-center justify-center rounded-2xl transition-shadow duration-300 {item.isColon
 						? 'h-28 w-14 rounded-xl'
 						: 'h-36 w-24'} {physics[i].hover
 						? 'shadow-[var(--theme-accent)]/20 shadow-2xl'

@@ -16,12 +16,40 @@
 		isHovered ? Math.min(Math.abs(rotateX) / 10 + Math.abs(rotateY) / 10, 1) : 0
 	);
 
+	import { settingsState } from '$lib/state.svelte';
+
 	function handleSearch(event: Event) {
 		event.preventDefault();
 		if (!searchQuery.trim()) return;
 
-		// Defaulting to Google search as requested
-		const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+		const query = encodeURIComponent(searchQuery.trim());
+		let searchUrl = `https://www.google.com/search?q=${query}`;
+
+		switch (settingsState.searchEngine) {
+			case 'duckduckgo':
+				searchUrl = `https://duckduckgo.com/?q=${query}`;
+				break;
+			case 'bing':
+				searchUrl = `https://www.bing.com/search?q=${query}`;
+				break;
+			case 'brave':
+				searchUrl = `https://search.brave.com/search?q=${query}`;
+				break;
+			case 'custom':
+				if (settingsState.customSearchUrl) {
+					if (settingsState.customSearchUrl.includes('%s')) {
+						searchUrl = settingsState.customSearchUrl.replace('%s', query);
+					} else {
+						searchUrl = `${settingsState.customSearchUrl}${query}`;
+					}
+				}
+				break;
+			case 'google':
+			default:
+				searchUrl = `https://www.google.com/search?q=${query}`;
+				break;
+		}
+
 		window.location.href = searchUrl;
 	}
 
@@ -57,6 +85,21 @@
 	function handlePointerEnter() {
 		isHovered = true;
 	}
+	let searchPlaceholder = $derived.by(() => {
+		switch (settingsState.searchEngine) {
+			case 'duckduckgo':
+				return 'Search DuckDuckGo...';
+			case 'bing':
+				return 'Search Bing...';
+			case 'brave':
+				return 'Search Brave...';
+			case 'custom':
+				return `Search ${settingsState.customSearchName ? settingsState.customSearchName : 'custom provider'}...`;
+			case 'google':
+			default:
+				return 'Search Google...';
+		}
+	});
 </script>
 
 <form
@@ -132,7 +175,7 @@
 	<input
 		type="text"
 		bind:value={searchQuery}
-		placeholder="Search the web..."
+		placeholder={searchPlaceholder}
 		class="relative z-10 w-full border-none bg-transparent text-lg font-medium text-slate-100 placeholder:text-slate-400 focus:ring-0 focus:outline-none"
 		autocomplete="off"
 		autofocus
