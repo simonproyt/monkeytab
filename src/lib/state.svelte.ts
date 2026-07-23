@@ -5,7 +5,11 @@ export const settingsState = $state({
 	solidColor: '#0f172a',
 	themeAccentMode: 'auto', // 'auto' | 'custom'
 	customThemeAccent: '#6366f1', // indigo-500
-	apodCache: { date: '', url: '', color: '' }
+	apodCache: { date: '', url: '', color: '' },
+	glassOpacity: 5, // 0 to 100 percentage
+	glassBlur: 24, // 0 to 100 pixels
+	glassTintMode: 'theme', // 'theme' | 'custom'
+	customGlassTint: '#ffffff'
 });
 
 export function initSettings() {
@@ -19,6 +23,10 @@ export function initSettings() {
 			if (parsed.themeAccentMode) settingsState.themeAccentMode = parsed.themeAccentMode;
 			if (parsed.customThemeAccent) settingsState.customThemeAccent = parsed.customThemeAccent;
 			if (parsed.apodCache) settingsState.apodCache = parsed.apodCache;
+			if (parsed.glassOpacity !== undefined) settingsState.glassOpacity = parsed.glassOpacity;
+			if (parsed.glassBlur !== undefined) settingsState.glassBlur = parsed.glassBlur;
+			if (parsed.glassTintMode) settingsState.glassTintMode = parsed.glassTintMode;
+			if (parsed.customGlassTint) settingsState.customGlassTint = parsed.customGlassTint;
 		} catch (e) {
 			console.error('Failed to parse settings', e);
 		}
@@ -34,7 +42,11 @@ export function saveSettings() {
 			solidColor: settingsState.solidColor,
 			themeAccentMode: settingsState.themeAccentMode,
 			customThemeAccent: settingsState.customThemeAccent,
-			apodCache: settingsState.apodCache
+			apodCache: settingsState.apodCache,
+			glassOpacity: settingsState.glassOpacity,
+			glassBlur: settingsState.glassBlur,
+			glassTintMode: settingsState.glassTintMode,
+			customGlassTint: settingsState.customGlassTint
 		})
 	);
 }

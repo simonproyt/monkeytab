@@ -133,60 +133,153 @@
 				{/if}
 
 				<!-- Theme Accent Color -->
-				<div class="space-y-3 border-t border-white/10 pt-4">
-					<h3 class="text-sm font-medium text-slate-300">Theme Accent Color</h3>
-					<div class="grid grid-cols-2 gap-2">
-						<button
-							class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.themeAccentMode ===
-							'auto'
-								? '!border-[var(--theme-accent)] text-white'
-								: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
-							style={settingsState.themeAccentMode === 'auto'
-								? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
-								: ''}
-							onclick={() => {
-								settingsState.themeAccentMode = 'auto';
-								saveSettings();
-							}}
-						>
-							Auto Extract
-						</button>
-						<button
-							class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.themeAccentMode ===
-							'custom'
-								? '!border-[var(--theme-accent)] text-white'
-								: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
-							style={settingsState.themeAccentMode === 'custom'
-								? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
-								: ''}
-							onclick={() => {
-								settingsState.themeAccentMode = 'custom';
-								saveSettings();
-							}}
-						>
-							Custom Color
-						</button>
+				<div class="space-y-4 border-t border-white/10 pt-4">
+					<div>
+						<h3 class="text-sm font-medium text-slate-200">Theme Accent Color</h3>
+						<p class="mt-1 text-xs text-slate-400">
+							Extract colors from your background automatically or set a custom accent.
+						</p>
+					</div>
+					<div class="space-y-3">
+						<div class="grid grid-cols-2 gap-2">
+							<button
+								class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.themeAccentMode ===
+								'auto'
+									? '!border-[var(--theme-accent)] text-white'
+									: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+								style={settingsState.themeAccentMode === 'auto'
+									? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+									: ''}
+								onclick={() => {
+									settingsState.themeAccentMode = 'auto';
+									saveSettings();
+								}}
+							>
+								Auto Extract
+							</button>
+							<button
+								class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.themeAccentMode ===
+								'custom'
+									? '!border-[var(--theme-accent)] text-white'
+									: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+								style={settingsState.themeAccentMode === 'custom'
+									? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+									: ''}
+								onclick={() => {
+									settingsState.themeAccentMode = 'custom';
+									saveSettings();
+								}}
+							>
+								Custom Color
+							</button>
+						</div>
+
+						{#if settingsState.themeAccentMode === 'custom'}
+							<div class="animate-in fade-in slide-in-from-top-2 flex items-center space-x-3">
+								<input
+									type="color"
+									bind:value={settingsState.customThemeAccent}
+									onchange={saveSettings}
+									class="h-8 w-14 cursor-pointer rounded border border-white/20 bg-transparent p-0.5"
+								/>
+								<span class="font-mono text-sm text-slate-300"
+									>{settingsState.customThemeAccent}</span
+								>
+							</div>
+						{/if}
 					</div>
 				</div>
 
-				<!-- Custom Accent Color Picker -->
-				{#if settingsState.themeAccentMode === 'custom'}
-					<div class="animate-in fade-in slide-in-from-top-2 space-y-3">
-						<div class="flex items-center gap-3">
-							<input
-								type="color"
-								value={settingsState.customThemeAccent}
-								oninput={(e) => {
-									settingsState.customThemeAccent = (e.target as HTMLInputElement).value;
+				<!-- Glass Appearance -->
+				<div class="space-y-4 border-t border-white/10 pt-4">
+					<div>
+						<h3 class="text-sm font-medium text-slate-200">Glass Appearance</h3>
+						<p class="mt-1 text-xs text-slate-400">
+							Configure transparency, blur, and tint for glass panels.
+						</p>
+					</div>
+
+					<!-- Opacity Slider -->
+					<div class="space-y-2">
+						<div class="flex justify-between text-xs text-slate-300">
+							<span>Opacity</span>
+							<span>{settingsState.glassOpacity}%</span>
+						</div>
+						<input
+							type="range"
+							min="0"
+							max="100"
+							bind:value={settingsState.glassOpacity}
+							onchange={saveSettings}
+							class="w-full accent-[var(--theme-accent)]"
+						/>
+					</div>
+
+					<!-- Blur Slider -->
+					<div class="space-y-2">
+						<div class="flex justify-between text-xs text-slate-300">
+							<span>Blur</span>
+							<span>{settingsState.glassBlur}px</span>
+						</div>
+						<input
+							type="range"
+							min="0"
+							max="100"
+							bind:value={settingsState.glassBlur}
+							onchange={saveSettings}
+							class="w-full accent-[var(--theme-accent)]"
+						/>
+					</div>
+
+					<!-- Tint Control -->
+					<div class="space-y-3 pt-2">
+						<div class="grid grid-cols-2 gap-2">
+							<button
+								class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.glassTintMode ===
+								'theme'
+									? '!border-[var(--theme-accent)] text-white'
+									: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+								style={settingsState.glassTintMode === 'theme'
+									? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+									: ''}
+								onclick={() => {
+									settingsState.glassTintMode = 'theme';
 									saveSettings();
 								}}
-								class="h-10 w-20 cursor-pointer rounded border-none bg-transparent p-0"
-							/>
-							<span class="font-mono text-sm text-slate-400">{settingsState.customThemeAccent}</span
 							>
+								Match Accent
+							</button>
+							<button
+								class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.glassTintMode ===
+								'custom'
+									? '!border-[var(--theme-accent)] text-white'
+									: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+								style={settingsState.glassTintMode === 'custom'
+									? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+									: ''}
+								onclick={() => {
+									settingsState.glassTintMode = 'custom';
+									saveSettings();
+								}}
+							>
+								Custom Tint
+							</button>
 						</div>
+
+						{#if settingsState.glassTintMode === 'custom'}
+							<div class="animate-in fade-in slide-in-from-top-2 flex items-center space-x-3">
+								<input
+									type="color"
+									bind:value={settingsState.customGlassTint}
+									onchange={saveSettings}
+									class="h-8 w-14 cursor-pointer rounded border border-white/20 bg-transparent p-0.5"
+								/>
+								<span class="font-mono text-sm text-slate-300">{settingsState.customGlassTint}</span
+								>
+							</div>
+						{/if}
 					</div>
-				{/if}
+				</div>
 			</div>
 		</div>
 	</div>

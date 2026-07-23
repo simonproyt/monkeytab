@@ -17,6 +17,10 @@
 			: extractedAccent || settingsState.customThemeAccent
 	);
 
+	let currentGlassTint = $derived(
+		settingsState.glassTintMode === 'theme' ? currentThemeAccent : settingsState.customGlassTint
+	);
+
 	$effect(() => {
 		initSettings();
 	});
@@ -83,7 +87,7 @@
 	class="relative min-h-screen w-full overflow-hidden font-sans text-slate-100 transition-colors duration-1000 selection:bg-indigo-500/30"
 	style="background-color: {settingsState.backgroundType === 'solid'
 		? settingsState.solidColor
-		: '#050505'}; --theme-accent: {currentThemeAccent};"
+		: '#050505'}; --theme-accent: {currentThemeAccent}; --glass-tint: {currentGlassTint}; --glass-opacity: {settingsState.glassOpacity}%; --glass-blur: {settingsState.glassBlur}px;"
 >
 	<!-- Dynamic Ambient Glows (used for gradient mode OR as a fallback during loading) -->
 	{#if settingsState.backgroundType === 'gradient' || (settingsState.backgroundType !== 'solid' && !fullImageLoaded)}
@@ -108,7 +112,7 @@
 			src="https://picsum.photos/192/108?blur=2"
 			alt=""
 			crossorigin="anonymous"
-			class="absolute inset-0 h-full w-full object-cover opacity-60 blur-md scale-105"
+			class="absolute inset-0 h-full w-full scale-105 object-cover opacity-60 blur-md"
 			onload={handleThumbLoad}
 		/>
 		<!-- High-res full image (Loaded directly, no proxy overhead) -->
@@ -129,7 +133,7 @@
 			src={`https://wsrv.nl/?url=${encodeURIComponent(apodUrl)}&w=100&blur=5`}
 			alt=""
 			crossorigin="anonymous"
-			class="absolute inset-0 h-full w-full object-cover opacity-60 blur-md scale-105"
+			class="absolute inset-0 h-full w-full scale-105 object-cover opacity-60 blur-md"
 			onload={handleThumbLoad}
 		/>
 		<!-- High-res full image (Loaded directly, no proxy overhead) -->
