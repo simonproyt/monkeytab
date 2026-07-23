@@ -2,6 +2,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import Settings from '$lib/components/Settings.svelte';
 	import Clock from '$lib/components/Clock.svelte';
+	import Weather from '$lib/components/Weather.svelte';
 	import { settingsState } from '$lib/state.svelte';
 
 	let isSettingsOpen = $state(false);
@@ -10,12 +11,16 @@
 <div class="relative flex h-full w-full flex-1 flex-col items-center justify-center p-8">
 	<div class="flex w-full max-w-2xl translate-y-[-10vh] flex-col items-center justify-center">
 		{#if settingsState.showClock}
-			<div class="animate-in fade-in zoom-in-95 mb-12 duration-1000">
+			<div class="animate-in fade-in zoom-in-95 mb-4 duration-1000">
 				<Clock />
 			</div>
 		{/if}
 
-		<div class="animate-in fade-in slide-in-from-bottom-4 w-full delay-150 duration-1000">
+		<div class="relative z-20 animate-in fade-in slide-in-from-bottom-2 delay-100 duration-1000">
+			<Weather />
+		</div>
+
+		<div class="relative z-10 animate-in fade-in slide-in-from-bottom-4 w-full delay-150 duration-1000">
 			<Search />
 		</div>
 	</div>

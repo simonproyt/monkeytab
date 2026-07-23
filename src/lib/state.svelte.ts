@@ -14,7 +14,13 @@ export const settingsState = $state({
 	clockFormat: '12h', // '12h' | '24h'
 	searchEngine: 'google', // 'google' | 'duckduckgo' | 'bing' | 'brave' | 'custom'
 	customSearchUrl: '',
-	customSearchName: ''
+	customSearchName: '',
+	showWeather: true,
+	weatherUnit: 'celsius', // 'celsius' | 'fahrenheit'
+	weatherLocationMode: 'auto', // 'auto' | 'manual'
+	weatherManualCity: '',
+	weatherManualLat: 0,
+	weatherManualLon: 0
 });
 
 export function initSettings() {
@@ -39,6 +45,16 @@ export function initSettings() {
 				settingsState.customSearchUrl = parsed.customSearchUrl;
 			if (parsed.customSearchName !== undefined)
 				settingsState.customSearchName = parsed.customSearchName;
+			if (parsed.showWeather !== undefined) settingsState.showWeather = parsed.showWeather;
+			if (parsed.weatherUnit) settingsState.weatherUnit = parsed.weatherUnit;
+			if (parsed.weatherLocationMode)
+				settingsState.weatherLocationMode = parsed.weatherLocationMode;
+			if (parsed.weatherManualCity !== undefined)
+				settingsState.weatherManualCity = parsed.weatherManualCity;
+			if (parsed.weatherManualLat !== undefined)
+				settingsState.weatherManualLat = parsed.weatherManualLat;
+			if (parsed.weatherManualLon !== undefined)
+				settingsState.weatherManualLon = parsed.weatherManualLon;
 		} catch (e) {
 			console.error('Failed to parse settings', e);
 		}
@@ -63,7 +79,17 @@ export function saveSettings() {
 			clockFormat: settingsState.clockFormat,
 			searchEngine: settingsState.searchEngine,
 			customSearchUrl: settingsState.customSearchUrl,
-			customSearchName: settingsState.customSearchName
+			customSearchName: settingsState.customSearchName,
+			showWeather: settingsState.showWeather,
+			weatherUnit: settingsState.weatherUnit,
+			weatherLocationMode: settingsState.weatherLocationMode,
+			weatherManualCity: settingsState.weatherManualCity,
+			weatherManualLat: settingsState.weatherManualLat,
+			weatherManualLon: settingsState.weatherManualLon
 		})
 	);
+}
+
+if (browser) {
+	initSettings();
 }

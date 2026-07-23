@@ -22,10 +22,6 @@
 	);
 
 	$effect(() => {
-		initSettings();
-	});
-
-	$effect(() => {
 		// Reset loaded state when background changes
 		const _ = settingsState.backgroundType;
 		fullImageLoaded = false;

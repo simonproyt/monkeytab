@@ -18,6 +18,34 @@
 		settingsState.solidColor = target.value;
 		saveSettings();
 	}
+
+	let geocodeLoading = $state(false);
+	let geocodeError = $state('');
+
+	async function searchLocation() {
+		if (!settingsState.weatherManualCity) return;
+		geocodeLoading = true;
+		geocodeError = '';
+		try {
+			const res = await fetch(
+				`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(settingsState.weatherManualCity)}&count=1`
+			);
+			const data = await res.json();
+			if (data.results && data.results.length > 0) {
+				const loc = data.results[0];
+				settingsState.weatherManualCity = `${loc.name}, ${loc.country}`;
+				settingsState.weatherManualLat = loc.latitude;
+				settingsState.weatherManualLon = loc.longitude;
+				saveSettings();
+			} else {
+				geocodeError = 'City not found';
+			}
+		} catch (err) {
+			geocodeError = 'Search failed';
+		} finally {
+			geocodeLoading = false;
+		}
+	}
 </script>
 
 {#if isOpen}
@@ -240,6 +268,128 @@
 								</button>
 							</div>
 						</div>
+					{/if}
+
+					<!-- Show Weather Toggle -->
+					<div class="flex items-center justify-between pt-2">
+						<span class="text-sm font-medium text-slate-300">Show Weather</span>
+						<button
+							class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors {settingsState.showWeather
+								? 'bg-[var(--theme-accent)]'
+								: 'bg-white/10'}"
+							onclick={() => {
+								settingsState.showWeather = !settingsState.showWeather;
+								saveSettings();
+							}}
+						>
+							<span
+								class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {settingsState.showWeather
+									? 'translate-x-6'
+									: 'translate-x-1'}"
+							></span>
+						</button>
+					</div>
+
+					{#if settingsState.showWeather}
+						<!-- Weather Unit -->
+						<div
+							class="animate-in fade-in slide-in-from-top-2 flex items-center justify-between pt-2"
+						>
+							<span class="text-sm font-medium text-slate-300">Unit</span>
+							<div class="flex space-x-1 rounded-lg border border-white/10 bg-black/20 p-1">
+								<button
+									class="rounded-md px-3 py-1 text-xs font-medium transition-colors {settingsState.weatherUnit ===
+									'celsius'
+										? 'bg-[var(--theme-accent)] text-white shadow'
+										: 'text-slate-400 hover:text-white'}"
+									onclick={() => {
+										settingsState.weatherUnit = 'celsius';
+										saveSettings();
+									}}
+								>
+									°C
+								</button>
+								<button
+									class="rounded-md px-3 py-1 text-xs font-medium transition-colors {settingsState.weatherUnit ===
+									'fahrenheit'
+										? 'bg-[var(--theme-accent)] text-white shadow'
+										: 'text-slate-400 hover:text-white'}"
+									onclick={() => {
+										settingsState.weatherUnit = 'fahrenheit';
+										saveSettings();
+									}}
+								>
+									°F
+								</button>
+							</div>
+						</div>
+
+						<!-- Location Mode -->
+						<div class="animate-in fade-in slide-in-from-top-2 space-y-2 pt-2">
+							<span class="text-sm font-medium text-slate-300">Location Mode</span>
+							<div class="grid grid-cols-2 gap-2">
+								<button
+									class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.weatherLocationMode ===
+									'auto'
+										? '!border-[var(--theme-accent)] text-white'
+										: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+									style={settingsState.weatherLocationMode === 'auto'
+										? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+										: ''}
+									onclick={() => {
+										settingsState.weatherLocationMode = 'auto';
+										saveSettings();
+									}}
+								>
+									Auto (GPS)
+								</button>
+								<button
+									class="rounded-lg border px-3 py-2 text-sm font-medium transition-colors {settingsState.weatherLocationMode ===
+									'manual'
+										? '!border-[var(--theme-accent)] text-white'
+										: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'}"
+									style={settingsState.weatherLocationMode === 'manual'
+										? 'background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent);'
+										: ''}
+									onclick={() => {
+										settingsState.weatherLocationMode = 'manual';
+										saveSettings();
+									}}
+								>
+									Manual
+								</button>
+							</div>
+						</div>
+
+						{#if settingsState.weatherLocationMode === 'manual'}
+							<div class="animate-in fade-in slide-in-from-top-2 space-y-2 pt-1">
+								<label for="weatherCity" class="block text-xs text-slate-400">Search City</label>
+								<div class="flex gap-2">
+									<input
+										id="weatherCity"
+										type="text"
+										placeholder="London, UK"
+										bind:value={settingsState.weatherManualCity}
+										onkeydown={(e) => e.key === 'Enter' && searchLocation()}
+										class="w-full rounded-lg border border-white/20 bg-black/40 px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-[var(--theme-accent)] focus:outline-none"
+									/>
+									<button
+										class="rounded-lg bg-[var(--theme-accent)] px-3 py-1.5 text-xs font-medium text-white shadow hover:opacity-90 disabled:opacity-50"
+										onclick={searchLocation}
+										disabled={geocodeLoading}
+									>
+										{geocodeLoading ? '...' : 'Search'}
+									</button>
+								</div>
+								{#if geocodeError}
+									<p class="text-xs text-red-400">{geocodeError}</p>
+								{:else if settingsState.weatherManualLat && !geocodeLoading}
+									<p class="text-xs text-green-400">
+										Location set to {settingsState.weatherManualCity}
+									</p>
+								{/if}
+							</div>
+						{/if}
 					{/if}
 				</div>
 
