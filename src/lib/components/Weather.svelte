@@ -12,7 +12,8 @@
 		CloudLightning, 
 		Thermometer,
 		Calendar,
-		ChevronDown
+		ChevronDown,
+		Droplets
 	} from '@lucide/svelte';
 
 	let loading = $state(true);
@@ -28,11 +29,13 @@
 			weathercode: number[];
 			temperature_2m_max: number[];
 			temperature_2m_min: number[];
+			precipitation_probability_max: number[];
 		};
 		hourly: {
 			time: string[];
 			temperature_2m: number[];
 			weathercode: number[];
+			precipitation_probability: number[];
 		};
 	} | null>(null);
 
@@ -105,6 +108,7 @@
 					parsed.unit === settingsState.weatherUnit &&
 					parsed.mode === settingsState.weatherLocationMode &&
 					parsed.data && parsed.data.daily && parsed.data.hourly &&
+					parsed.data.hourly.precipitation_probability &&
 					(settingsState.weatherLocationMode === 'auto' ||
 						(parsed.lat === settingsState.weatherManualLat &&
 							parsed.lon === settingsState.weatherManualLon))
@@ -121,7 +125,7 @@
 	async function fetchWeather(lat: number, lon: number) {
 		try {
 			const res = await fetch(
-				`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weathercode&timezone=auto&temperature_unit=${settingsState.weatherUnit}`
+				`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=temperature_2m,weathercode,precipitation_probability&timezone=auto&temperature_unit=${settingsState.weatherUnit}`
 			);
 			if (!res.ok) throw new Error('Failed to fetch');
 			const data = await res.json();
@@ -199,6 +203,8 @@
 		}
 	});
 
+	import { slide, fade, fly } from 'svelte/transition';
+
 	// Physics state for hover sheen
 	let isHovered = $state(false);
 	let mouseX = $state(0);
@@ -208,6 +214,25 @@
 	
 	let isPopoverOpen = $state(false);
 	let expandedDay: number | null = $state(null);
+
+	let scrollContainer: HTMLDivElement | null = $state(null);
+	let canScrollLeft = $state(false);
+	let canScrollRight = $state(true);
+
+	function updateScrollState() {
+		if (scrollContainer) {
+			canScrollLeft = scrollContainer.scrollLeft > 0;
+			canScrollRight = scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth - 1;
+		}
+	}
+
+	$effect(() => {
+		// When expanded day changes, check scroll state
+		if (expandedDay !== null && scrollContainer) {
+			// small delay to let DOM render
+			setTimeout(updateScrollState, 50);
+		}
+	});
 
 	function togglePopover() {
 		if (weatherData) {
@@ -285,7 +310,10 @@
 
 		<!-- Weekly Forecast Popover -->
 		{#if isPopoverOpen && weatherData}
-			<div class="absolute top-full mt-3 w-64 rounded-2xl glass-panel ultra-premium-glass variable-blur-mask p-4 shadow-xl z-50 flex flex-col gap-3 transition-all duration-300 origin-top animate-in fade-in slide-in-from-top-2">
+			<div 
+				transition:fly={{ y: -10, duration: 300 }}
+				class="absolute top-full mt-3 w-64 rounded-2xl glass-panel ultra-premium-glass variable-blur-mask p-4 shadow-xl z-50 flex flex-col gap-3 origin-top"
+			>
 				<div class="glass-noise rounded-2xl"></div>
 				<div class="pointer-events-none absolute inset-0 rounded-2xl bg-white/5"></div>
 				
@@ -322,21 +350,62 @@
 							{#if expandedDay === i}
 								{@const currentHour = new Date().getHours()}
 								{@const startIndex = i * 24}
-								<div class="flex gap-3 overflow-x-auto pb-2 pt-2 px-2 animate-in fade-in slide-in-from-top-2" style="scrollbar-width: none; -ms-overflow-style: none; mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 20px), transparent);">
-									{#each Array.from({ length: 24 }) as _, h}
-										{#if !isToday || h >= currentHour}
-											{@const hourIndex = startIndex + h}
-											{@const hourDetails = getWeatherDetails(weatherData.hourly.weathercode[hourIndex], 1)}
-											{@const hourDate = new Date(weatherData.hourly.time[hourIndex])}
-											<div class="flex flex-col items-center gap-1.5 min-w-[3rem]">
-												<span class="text-[10px] text-white/50">{hourDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</span>
-												<div class="flex items-center justify-center {hourDetails.iconColor}">
-													<svelte:component this={hourDetails.Icon} size={14} strokeWidth={2.5} />
+								<div transition:slide={{ duration: 300 }} class="relative mt-1 group">
+									{#if canScrollLeft}
+									<!-- Left Arrow -->
+									<button 
+										transition:fade={{ duration: 150 }}
+										class="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-0 group-hover:opacity-100"
+										onclick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+											if (scrollContainer) scrollContainer.scrollBy({ left: -150, behavior: 'smooth' });
+										}}
+									>
+										<ChevronDown size={14} class="rotate-90" />
+									</button>
+									{/if}
+
+									{#if canScrollRight}
+									<!-- Right Arrow -->
+									<button 
+										transition:fade={{ duration: 150 }}
+										class="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-80 hover:opacity-100"
+										onclick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+											if (scrollContainer) scrollContainer.scrollBy({ left: 150, behavior: 'smooth' });
+										}}
+									>
+										<ChevronDown size={14} class="-rotate-90" />
+									</button>
+									{/if}
+
+									<div 
+										bind:this={scrollContainer}
+										onscroll={updateScrollState}
+										class="hourly-scroll-container flex gap-3 overflow-x-auto pb-2 pt-2 px-4" 
+										style="scrollbar-width: none; -ms-overflow-style: none; mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);"
+									>
+										{#each Array.from({ length: 24 }) as _, h}
+											{#if !isToday || h >= currentHour}
+												{@const hourIndex = startIndex + h}
+												{@const hourDetails = getWeatherDetails(weatherData.hourly.weathercode[hourIndex], 1)}
+												{@const hourDate = new Date(weatherData.hourly.time[hourIndex])}
+												<div class="flex flex-col items-center gap-1.5 min-w-[3.5rem]">
+													<span class="text-[10px] text-white/50 whitespace-nowrap">{hourDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</span>
+													<div class="flex items-center justify-center {hourDetails.iconColor}">
+														<svelte:component this={hourDetails.Icon} size={16} strokeWidth={2.5} />
+													</div>
+													<span class="text-xs text-white/80 font-medium">{Math.round(weatherData.hourly.temperature_2m[hourIndex])}°</span>
+													<div class="flex items-center gap-0.5 text-blue-300/70">
+														<Droplets size={10} />
+														<span class="text-[10px] font-medium">{weatherData.hourly.precipitation_probability[hourIndex]}%</span>
+													</div>
 												</div>
-												<span class="text-xs text-white/80">{Math.round(weatherData.hourly.temperature_2m[hourIndex])}°</span>
-											</div>
-										{/if}
-									{/each}
+											{/if}
+										{/each}
+									</div>
 								</div>
 							{/if}
 						</div>
@@ -344,5 +413,5 @@
 				</div>
 			</div>
 		{/if}
-	</div>
+</div>
 {/if}
