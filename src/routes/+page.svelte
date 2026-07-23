@@ -1,20 +1,28 @@
 <script lang="ts">
 	import Search from '$lib/components/Search.svelte';
 	import Settings from '$lib/components/Settings.svelte';
+	import Clock from '$lib/components/Clock.svelte';
+	import { settingsState } from '$lib/state.svelte';
 
 	let isSettingsOpen = $state(false);
 </script>
 
-<div class="relative flex flex-1 flex-col items-center justify-center p-8">
-	<div
-		class="animate-in fade-in slide-in-from-bottom-4 w-full max-w-2xl translate-y-[-10vh] duration-1000"
-	>
-		<Search />
+<div class="relative flex h-full w-full flex-1 flex-col items-center justify-center p-8">
+	<div class="flex w-full max-w-2xl translate-y-[-10vh] flex-col items-center justify-center">
+		{#if settingsState.showClock}
+			<div class="animate-in fade-in zoom-in-95 mb-12 duration-1000">
+				<Clock />
+			</div>
+		{/if}
+
+		<div class="animate-in fade-in slide-in-from-bottom-4 w-full delay-150 duration-1000">
+			<Search />
+		</div>
 	</div>
 
 	<!-- Settings Button -->
 	<button
-		class="glass-panel absolute right-8 bottom-8 flex items-center justify-center rounded-full p-3 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+		class="glass-panel fixed right-8 bottom-8 flex items-center justify-center rounded-full p-3 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
 		aria-label="Settings"
 		onclick={() => (isSettingsOpen = true)}
 	>

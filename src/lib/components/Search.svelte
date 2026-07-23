@@ -86,8 +86,6 @@
 		<rect width="100%" height="100%" filter="url(#noiseFilter)" />
 	</svg>
 
-
-
 	<!-- Mouse-Tracking Liquid Spotlight -->
 	<div
 		class="pointer-events-none absolute inset-0 transition-opacity duration-500"

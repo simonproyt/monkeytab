@@ -38,7 +38,7 @@
 			} else {
 				extractedAccent = null;
 				fetch('/api/apod')
-					.then((res) => res.json())
+					.then((res) => res.json() as Promise<{ url?: string }>)
 					.then((data) => {
 						if (data.url) {
 							apodUrl = data.url;

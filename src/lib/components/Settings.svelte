@@ -61,6 +61,69 @@
 			<h2 class="mb-6 text-xl font-semibold text-white">Settings</h2>
 
 			<div class="space-y-6">
+				<!-- Widgets -->
+				<div class="space-y-4 border-b border-white/10 pb-4">
+					<div>
+						<h3 class="text-sm font-medium text-slate-200">Widgets</h3>
+						<p class="mt-1 text-xs text-slate-400">Enable and configure your dashboard widgets.</p>
+					</div>
+
+					<!-- Show Clock Toggle -->
+					<div class="flex items-center justify-between">
+						<span class="text-sm font-medium text-slate-300">Show Clock</span>
+						<button
+							class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors {settingsState.showClock
+								? 'bg-[var(--theme-accent)]'
+								: 'bg-white/10'}"
+							onclick={() => {
+								settingsState.showClock = !settingsState.showClock;
+								saveSettings();
+							}}
+						>
+							<span
+								class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {settingsState.showClock
+									? 'translate-x-6'
+									: 'translate-x-1'}"
+							></span>
+						</button>
+					</div>
+
+					<!-- Clock Format (12h vs 24h) -->
+					{#if settingsState.showClock}
+						<div
+							class="animate-in fade-in slide-in-from-top-2 flex items-center justify-between pt-2"
+						>
+							<span class="text-sm font-medium text-slate-300">Time Format</span>
+							<div class="flex space-x-1 rounded-lg border border-white/10 bg-black/20 p-1">
+								<button
+									class="rounded-md px-3 py-1 text-xs font-medium transition-colors {settingsState.clockFormat ===
+									'12h'
+										? 'bg-[var(--theme-accent)] text-white shadow'
+										: 'text-slate-400 hover:text-white'}"
+									onclick={() => {
+										settingsState.clockFormat = '12h';
+										saveSettings();
+									}}
+								>
+									12h
+								</button>
+								<button
+									class="rounded-md px-3 py-1 text-xs font-medium transition-colors {settingsState.clockFormat ===
+									'24h'
+										? 'bg-[var(--theme-accent)] text-white shadow'
+										: 'text-slate-400 hover:text-white'}"
+									onclick={() => {
+										settingsState.clockFormat = '24h';
+										saveSettings();
+									}}
+								>
+									24h
+								</button>
+							</div>
+						</div>
+					{/if}
+				</div>
+
 				<!-- Background Type -->
 				<div class="space-y-3">
 					<h3 class="text-sm font-medium text-slate-300">Background Style</h3>

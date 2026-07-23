@@ -9,7 +9,7 @@ export async function GET() {
 		if (!res.ok) {
 			return json({ error: 'Failed to fetch APOD' }, { status: res.status });
 		}
-		const data = await res.json();
+		const data = (await res.json()) as { hdurl?: string; url?: string };
 		return json({ url: data.hdurl || data.url });
 	} catch (error) {
 		return json({ error: 'Internal server error' }, { status: 500 });

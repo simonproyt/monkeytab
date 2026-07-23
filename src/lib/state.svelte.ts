@@ -9,7 +9,9 @@ export const settingsState = $state({
 	glassOpacity: 5, // 0 to 100 percentage
 	glassBlur: 24, // 0 to 100 pixels
 	glassTintMode: 'theme', // 'theme' | 'custom'
-	customGlassTint: '#ffffff'
+	customGlassTint: '#ffffff',
+	showClock: true,
+	clockFormat: '12h' // '12h' | '24h'
 });
 
 export function initSettings() {
@@ -27,6 +29,8 @@ export function initSettings() {
 			if (parsed.glassBlur !== undefined) settingsState.glassBlur = parsed.glassBlur;
 			if (parsed.glassTintMode) settingsState.glassTintMode = parsed.glassTintMode;
 			if (parsed.customGlassTint) settingsState.customGlassTint = parsed.customGlassTint;
+			if (parsed.showClock !== undefined) settingsState.showClock = parsed.showClock;
+			if (parsed.clockFormat) settingsState.clockFormat = parsed.clockFormat;
 		} catch (e) {
 			console.error('Failed to parse settings', e);
 		}
@@ -46,7 +50,9 @@ export function saveSettings() {
 			glassOpacity: settingsState.glassOpacity,
 			glassBlur: settingsState.glassBlur,
 			glassTintMode: settingsState.glassTintMode,
-			customGlassTint: settingsState.customGlassTint
+			customGlassTint: settingsState.customGlassTint,
+			showClock: settingsState.showClock,
+			clockFormat: settingsState.clockFormat
 		})
 	);
 }
