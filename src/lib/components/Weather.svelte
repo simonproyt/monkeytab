@@ -204,7 +204,7 @@
 	});
 
 	import { slide, fade, fly, scale } from 'svelte/transition';
-	import { cubicOut, quintOut } from 'svelte/easing';
+	import { cubicOut, quintOut, expoOut } from 'svelte/easing';
 
 	// Physics state for hover sheen
 	let isHovered = $state(false);
@@ -312,7 +312,7 @@
 		<!-- Weekly Forecast Popover -->
 		{#if isPopoverOpen && weatherData}
 			<div 
-				transition:scale={{ start: 0.95, duration: 250, easing: cubicOut, opacity: 0 }}
+				transition:scale={{ start: 0.95, duration: 500, easing: expoOut, opacity: 0 }}
 				class="absolute top-full mt-3 w-64 rounded-2xl glass-panel ultra-premium-glass variable-blur-mask p-4 shadow-xl z-50 flex flex-col gap-3 origin-top"
 			>
 				<div class="glass-noise rounded-2xl"></div>
@@ -351,12 +351,12 @@
 							{#if expandedDay === i}
 								{@const currentHour = new Date().getHours()}
 								{@const startIndex = i * 24}
-								<div transition:slide={{ duration: 300, easing: quintOut }} class="relative group overflow-hidden">
+								<div transition:slide={{ duration: 600, easing: expoOut }} class="relative group overflow-hidden">
 									<div class="pt-2 pb-1 relative">
 										{#if canScrollLeft}
 										<!-- Left Arrow -->
 										<button 
-											transition:fade={{ duration: 150 }}
+											transition:fade={{ duration: 300 }}
 											class="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-0 group-hover:opacity-100"
 											onclick={(e) => {
 												e.preventDefault();
@@ -371,7 +371,7 @@
 										{#if canScrollRight}
 										<!-- Right Arrow -->
 										<button 
-											transition:fade={{ duration: 150 }}
+											transition:fade={{ duration: 300 }}
 											class="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-80 hover:opacity-100"
 											onclick={(e) => {
 												e.preventDefault();

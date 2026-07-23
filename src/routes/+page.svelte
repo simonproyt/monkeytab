@@ -8,7 +8,7 @@
 	let isSettingsOpen = $state(false);
 </script>
 
-<div class="relative flex h-full w-full flex-1 flex-col items-center justify-center p-8">
+<div class="relative flex h-screen w-full flex-none flex-col items-center justify-center p-8">
 	<div class="flex w-full max-w-2xl translate-y-[-10vh] flex-col items-center justify-center">
 		{#if settingsState.showClock}
 			<div class="animate-in fade-in zoom-in-95 mb-4 duration-1000">
