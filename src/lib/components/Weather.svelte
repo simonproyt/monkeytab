@@ -203,7 +203,8 @@
 		}
 	});
 
-	import { slide, fade, fly } from 'svelte/transition';
+	import { slide, fade, fly, scale } from 'svelte/transition';
+	import { cubicOut, quintOut } from 'svelte/easing';
 
 	// Physics state for hover sheen
 	let isHovered = $state(false);
@@ -311,7 +312,7 @@
 		<!-- Weekly Forecast Popover -->
 		{#if isPopoverOpen && weatherData}
 			<div 
-				transition:fly={{ y: -10, duration: 300 }}
+				transition:scale={{ start: 0.95, duration: 250, easing: cubicOut, opacity: 0 }}
 				class="absolute top-full mt-3 w-64 rounded-2xl glass-panel ultra-premium-glass variable-blur-mask p-4 shadow-xl z-50 flex flex-col gap-3 origin-top"
 			>
 				<div class="glass-noise rounded-2xl"></div>
@@ -350,61 +351,63 @@
 							{#if expandedDay === i}
 								{@const currentHour = new Date().getHours()}
 								{@const startIndex = i * 24}
-								<div transition:slide={{ duration: 300 }} class="relative mt-1 group">
-									{#if canScrollLeft}
-									<!-- Left Arrow -->
-									<button 
-										transition:fade={{ duration: 150 }}
-										class="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-0 group-hover:opacity-100"
-										onclick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											if (scrollContainer) scrollContainer.scrollBy({ left: -150, behavior: 'smooth' });
-										}}
-									>
-										<ChevronDown size={14} class="rotate-90" />
-									</button>
-									{/if}
+								<div transition:slide={{ duration: 300, easing: quintOut }} class="relative group overflow-hidden">
+									<div class="pt-2 pb-1 relative">
+										{#if canScrollLeft}
+										<!-- Left Arrow -->
+										<button 
+											transition:fade={{ duration: 150 }}
+											class="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-0 group-hover:opacity-100"
+											onclick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												if (scrollContainer) scrollContainer.scrollBy({ left: -150, behavior: 'smooth' });
+											}}
+										>
+											<ChevronDown size={14} class="rotate-90" />
+										</button>
+										{/if}
 
-									{#if canScrollRight}
-									<!-- Right Arrow -->
-									<button 
-										transition:fade={{ duration: 150 }}
-										class="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-80 hover:opacity-100"
-										onclick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											if (scrollContainer) scrollContainer.scrollBy({ left: 150, behavior: 'smooth' });
-										}}
-									>
-										<ChevronDown size={14} class="-rotate-90" />
-									</button>
-									{/if}
+										{#if canScrollRight}
+										<!-- Right Arrow -->
+										<button 
+											transition:fade={{ duration: 150 }}
+											class="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md shadow-lg opacity-80 hover:opacity-100"
+											onclick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												if (scrollContainer) scrollContainer.scrollBy({ left: 150, behavior: 'smooth' });
+											}}
+										>
+											<ChevronDown size={14} class="-rotate-90" />
+										</button>
+										{/if}
 
-									<div 
-										bind:this={scrollContainer}
-										onscroll={updateScrollState}
-										class="hourly-scroll-container flex gap-3 overflow-x-auto pb-2 pt-2 px-4" 
-										style="scrollbar-width: none; -ms-overflow-style: none; mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);"
-									>
-										{#each Array.from({ length: 24 }) as _, h}
-											{#if !isToday || h >= currentHour}
-												{@const hourIndex = startIndex + h}
-												{@const hourDetails = getWeatherDetails(weatherData.hourly.weathercode[hourIndex], 1)}
-												{@const hourDate = new Date(weatherData.hourly.time[hourIndex])}
-												<div class="flex flex-col items-center gap-1.5 min-w-[3.5rem]">
-													<span class="text-[10px] text-white/50 whitespace-nowrap">{hourDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</span>
-													<div class="flex items-center justify-center {hourDetails.iconColor}">
-														<svelte:component this={hourDetails.Icon} size={16} strokeWidth={2.5} />
+										<div 
+											bind:this={scrollContainer}
+											onscroll={updateScrollState}
+											class="hourly-scroll-container flex gap-3 overflow-x-auto pb-1 pt-1 px-4" 
+											style="scrollbar-width: none; -ms-overflow-style: none; mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);"
+										>
+											{#each Array.from({ length: 24 }) as _, h}
+												{#if !isToday || h >= currentHour}
+													{@const hourIndex = startIndex + h}
+													{@const hourDetails = getWeatherDetails(weatherData.hourly.weathercode[hourIndex], 1)}
+													{@const hourDate = new Date(weatherData.hourly.time[hourIndex])}
+													<div class="flex flex-col items-center gap-1.5 min-w-[3.5rem]">
+														<span class="text-[10px] text-white/50 whitespace-nowrap">{hourDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</span>
+														<div class="flex items-center justify-center {hourDetails.iconColor}">
+															<svelte:component this={hourDetails.Icon} size={16} strokeWidth={2.5} />
+														</div>
+														<span class="text-xs text-white/80 font-medium">{Math.round(weatherData.hourly.temperature_2m[hourIndex])}°</span>
+														<div class="flex items-center gap-0.5 text-blue-300/70">
+															<Droplets size={10} />
+															<span class="text-[10px] font-medium">{weatherData.hourly.precipitation_probability[hourIndex]}%</span>
+														</div>
 													</div>
-													<span class="text-xs text-white/80 font-medium">{Math.round(weatherData.hourly.temperature_2m[hourIndex])}°</span>
-													<div class="flex items-center gap-0.5 text-blue-300/70">
-														<Droplets size={10} />
-														<span class="text-[10px] font-medium">{weatherData.hourly.precipitation_probability[hourIndex]}%</span>
-													</div>
-												</div>
-											{/if}
-										{/each}
+												{/if}
+											{/each}
+										</div>
 									</div>
 								</div>
 							{/if}
