@@ -32,22 +32,27 @@
 
 		if (settingsState.backgroundType === 'apod') {
 			const today = new Date().toISOString().split('T')[0];
+
+			// 1. Immediately load cached APOD to prevent flashing
 			if (settingsState.apodCache.date === today && settingsState.apodCache.url) {
 				apodUrl = settingsState.apodCache.url;
 				if (settingsState.apodCache.color) extractedAccent = settingsState.apodCache.color;
 			} else {
 				extractedAccent = null;
-				fetch('/api/apod')
-					.then((res) => res.json() as Promise<{ url?: string }>)
-					.then((data) => {
-						if (data.url) {
-							apodUrl = data.url;
-							settingsState.apodCache = { date: today, url: data.url, color: '' };
-							saveSettings();
-						}
-					})
-					.catch(console.error);
 			}
+
+			// 2. Always revalidate in the background (Stale-While-Revalidate)
+			fetch('/api/apod?t=' + Date.now(), { cache: 'no-store' })
+				.then((res) => res.json() as Promise<{ url?: string }>)
+				.then((data) => {
+					if (data.url && data.url !== settingsState.apodCache.url) {
+						apodUrl = data.url;
+						extractedAccent = null; // Reset so image load triggers re-extract
+						settingsState.apodCache = { date: today, url: data.url, color: '' };
+						saveSettings();
+					}
+				})
+				.catch(console.error);
 		} else if (settingsState.backgroundType === 'picsum') {
 			// For Picsum, we re-extract color each time since it's random
 			extractedAccent = null;
@@ -151,4 +156,20 @@
 	<main class="relative z-10 flex min-h-screen flex-col">
 		{@render children()}
 	</main>
+
+	<!-- Global SVG Filters for Liquid Distortion -->
+	<svg class="pointer-events-none absolute h-0 w-0" aria-hidden="true">
+		<defs>
+			<filter id="liquid-distortion">
+				<feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" result="noise" />
+				<feDisplacementMap
+					in="SourceGraphic"
+					in2="noise"
+					scale="1.5"
+					xChannelSelector="R"
+					yChannelSelector="G"
+				/>
+			</filter>
+		</defs>
+	</svg>
 </div>

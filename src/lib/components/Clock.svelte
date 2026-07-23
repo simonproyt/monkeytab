@@ -50,12 +50,19 @@
 	]);
 
 	let animationFrameId: number;
+	let digitRects: DOMRect[] = [];
+
+	function updateDigitRects() {
+		digitRects = digitElements.map((el) => (el ? el.getBoundingClientRect() : new DOMRect()));
+	}
 
 	function updatePhysics() {
 		digitElements.forEach((el, i) => {
 			if (!el) return;
 
-			const rect = el.getBoundingClientRect();
+			const rect = digitRects[i];
+			if (!rect || rect.width === 0) return;
+
 			const centerX = rect.left + rect.width / 2;
 			const centerY = rect.top + rect.height / 2;
 
@@ -109,8 +116,13 @@
 
 		window.addEventListener('mousemove', handleGlobalMouseMove);
 		window.addEventListener('mouseleave', handleGlobalMouseLeave);
+		window.addEventListener('resize', updateDigitRects);
 
-		updatePhysics();
+		// Give DOM a tick to layout the digits before calculating rects
+		setTimeout(() => {
+			updateDigitRects();
+			updatePhysics();
+		}, 50);
 	});
 
 	onDestroy(() => {
@@ -119,6 +131,7 @@
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('mousemove', handleGlobalMouseMove);
 			window.removeEventListener('mouseleave', handleGlobalMouseLeave);
+			window.removeEventListener('resize', updateDigitRects);
 		}
 	});
 
@@ -151,7 +164,7 @@
 			{#if item.char}
 				<div
 					bind:this={digitElements[i]}
-					class="glass-panel ultra-premium-glass relative flex items-center justify-center rounded-2xl transition-shadow duration-300 {item.isColon
+					class="glass-panel ultra-premium-glass liquid-distortion variable-blur-mask relative flex items-center justify-center rounded-2xl transition-shadow duration-300 {item.isColon
 						? 'h-28 w-14 rounded-xl'
 						: 'h-36 w-24'} {physics[i].hover
 						? 'shadow-[var(--theme-accent)]/20 shadow-2xl'
@@ -162,6 +175,9 @@
 						transform-style: preserve-3d;
 					"
 				>
+					<!-- Sub-surface Noise Caustics -->
+					<div class="glass-noise"></div>
+
 					<!-- Dynamic Mouse Spotlight Glow per digit -->
 					<div
 						class="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-300"

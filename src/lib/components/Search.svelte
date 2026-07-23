@@ -108,7 +108,7 @@
 	onpointermove={handlePointerMove}
 	onpointerleave={handlePointerLeave}
 	onpointerenter={handlePointerEnter}
-	class="glass-panel ultra-premium-glass group relative flex w-full max-w-2xl items-center gap-4 rounded-full px-6 py-4 focus-within:ring-2 focus-within:ring-[var(--theme-accent)]"
+	class="glass-panel ultra-premium-glass liquid-distortion variable-blur-mask group relative flex w-full max-w-2xl items-center gap-4 rounded-full px-6 py-4 focus-within:ring-2 focus-within:ring-[var(--theme-accent)]"
 	style="
 		--mouse-x: {mouseX}px; 
 		--mouse-y: {mouseY}px; 
@@ -118,16 +118,8 @@
 		--shadow-y: {shadowY}px;
 	"
 >
-	<!-- SVG Noise Grain Overlay -->
-	<svg
-		class="pointer-events-none absolute inset-0 h-full w-full opacity-[0.25] mix-blend-overlay"
-		style="border-radius: inherit;"
-	>
-		<filter id="noiseFilter">
-			<feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
-		</filter>
-		<rect width="100%" height="100%" filter="url(#noiseFilter)" />
-	</svg>
+	<!-- Sub-surface Noise Caustics -->
+	<div class="glass-noise"></div>
 
 	<!-- Mouse-Tracking Liquid Spotlight -->
 	<div
